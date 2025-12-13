@@ -1,7 +1,7 @@
 # Личный проект «Readme»
 
-* Студент: [Артём Василенко](https://up.htmlacademy.ru/nodejs-2-individual/2/user/2675107).
-* Наставник: `Неизвестно`.
+- Студент: [Артём Василенко](https://up.htmlacademy.ru/nodejs-2-individual/2/user/2675107).
+- Наставник: `Евгений Наумов`.
 
 ---
 

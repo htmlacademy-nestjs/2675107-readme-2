@@ -7,7 +7,7 @@ export class CreateUserDto {
   })
   public email: string;
 
-    @ApiProperty({
+  @ApiProperty({
     description: 'User birth date',
     example: '1981-03-12',
   })
@@ -19,7 +19,7 @@ export class CreateUserDto {
   })
   public firstname: string;
 
-    @ApiProperty({
+  @ApiProperty({
     description: 'User last name',
     example: 'Ivanov'
   })

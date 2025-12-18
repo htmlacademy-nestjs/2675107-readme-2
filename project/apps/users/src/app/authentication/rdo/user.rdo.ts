@@ -38,7 +38,7 @@ export class UserRdo {
   @Expose()
   public firstname: string;
 
-   @ApiProperty({
+  @ApiProperty({
     description: 'User last name',
     example: 'Keks'
   })

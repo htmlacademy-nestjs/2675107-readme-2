@@ -1,7 +1,5 @@
+import { User } from "./user.interface";
 
-export interface AuthUser {
-  id?: string;
-  email: string;
-  name: string;
+export interface AuthUser extends User {
   passwordHash: string;
 }

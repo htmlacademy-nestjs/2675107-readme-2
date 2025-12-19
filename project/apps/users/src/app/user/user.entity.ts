@@ -33,8 +33,14 @@ export class UserEntity implements AuthUser, Entity<string> {
   }
 
   public populate(data: AuthUser): void {
+    this.id = data.id;
     this.email = data.email;
     this.name = data.name;
+    this.postsCount = data.postsCount;
+    this.likes = data.likes;
+    this.followers = data.followers;
+    this.following = data.following;
+    this.dateRegistry = data.dateRegistry;
     this.passwordHash = data.passwordHash
   }
 

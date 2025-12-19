@@ -15,7 +15,8 @@ export class AuthenticationService {
     const {email, name, password} = dto;
 
     const user = {
-      email, name, avatar: '', passwordHash: ''
+      email, name, avatar: '', passwordHash: '', postsCount: 0,
+      likes: 0, followers: 0, following: 0, dateRegistry: new Date
     };
 
     const existUser = await this.userRepository
@@ -44,7 +45,7 @@ export class AuthenticationService {
       throw new UnauthorizedException(AUTH_USER_PASSWORD_WRONG);
     }
 
-    return existUser;
+    return {accessToken: 'token'};
   }
 
   public async getUser(id: string) {

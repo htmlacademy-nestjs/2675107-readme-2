@@ -10,7 +10,6 @@ export class ShowUserRdo {
   @Expose()
   public id: string;
 
-
   @ApiProperty({
     description: 'Users followers',
     example: '2'

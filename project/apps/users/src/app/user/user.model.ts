@@ -3,17 +3,12 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AuthUser } from '@project/shared/app/types';;
 
 @Schema({
-  collection: 'accounts',
+  collection: 'users',
   timestamps: true,
 })
 export class UserModel extends Document implements AuthUser {
   @Prop()
   public avatar: string;
-
-  @Prop({
-    required: true,
-  })
-  public dateOfBirth: Date;
 
   @Prop({
     required: true,
@@ -24,12 +19,37 @@ export class UserModel extends Document implements AuthUser {
   @Prop({
     required: true,
   })
-  public firstname: string;
+  public name: string;
 
   @Prop({
     required: true,
+    default: 0
   })
-  public lastname: string;
+  public likes: number;
+
+  @Prop({
+    required: true,
+    default: 0
+  })
+  public postsCount: number;
+
+  @Prop({
+    required: true,
+    default: 0
+  })
+  public followers: number;
+
+  @Prop({
+    required: true,
+    default: 0
+  })
+  public following: number;
+
+  @Prop({
+    required: true,
+    default: Date.now
+  })
+  public dateRegistry: Date;
 
   @Prop({
     required: true,

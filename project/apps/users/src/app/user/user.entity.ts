@@ -6,9 +6,12 @@ import { compare, genSalt, hash } from 'bcrypt';
 export class UserEntity implements AuthUser, Entity<string> {
   public id?: string;
   public email: string;
-  public firstname: string;
-  public lastname: string;
-  public dateOfBirth: Date;
+  public name: string;
+  public postsCount: number;
+  public likes: number;
+  public followers: number;
+  public following: number;
+  public dateRegistry: Date;
   public passwordHash: string;
 
   constructor(user: AuthUser) {
@@ -19,18 +22,19 @@ export class UserEntity implements AuthUser, Entity<string> {
     return {
       id: this.id,
       email: this.email,
-      firstname: this.firstname,
-      lastname: this.lastname,
-      dateOfBirth: this.dateOfBirth,
+      name: this.name,
+      postsCount: this.postsCount,
+      likes: this.likes,
+      followers: this.followers,
+      following: this.following,
+      dateRegistry: this.dateRegistry,
       passwordHash: this.passwordHash,
     };
   }
 
   public populate(data: AuthUser): void {
     this.email = data.email;
-    this.firstname = data.firstname;
-    this.lastname = data.lastname;
-    this.dateOfBirth = data.dateOfBirth;
+    this.name = data.name;
     this.passwordHash = data.passwordHash
   }
 

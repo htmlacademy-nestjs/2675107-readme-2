@@ -6,6 +6,7 @@ import { fillDto } from '@project/shared/helpers';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoggedUserRdo } from './rdo/logged-user.rdo';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ShowUserRdo } from './rdo/show-user.rdo';
 
 @ApiTags('authentication')
 @Controller('auth')
@@ -36,17 +37,17 @@ export class AuthenticationController {
   @Post('login')
   public async login(@Body() dto: LoginUserDto) {
     const verifiedUser = await this.authService.verifyUser(dto);
-    return fillDto(LoggedUserRdo, verifiedUser.toPOJO());
+    return fillDto(LoggedUserRdo, verifiedUser);
   }
 
   @ApiResponse({
-    type: UserRdo,
+    type: ShowUserRdo,
     status: HttpStatus.OK,
     description: 'User found'
   })
   @Get(':id')
   public async show(@Param('id') id: string) {
     const existUser = await this.authService.getUser(id);
-    return fillDto(UserRdo, existUser.toPOJO());
+    return fillDto(ShowUserRdo, existUser.toPOJO());
   }
 }

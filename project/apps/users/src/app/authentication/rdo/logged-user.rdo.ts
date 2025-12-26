@@ -4,23 +4,8 @@ import { Expose } from 'class-transformer';
 export class LoggedUserRdo {
 
   @ApiProperty({
-    description: 'The uniq user ID',
-    example: '13'
-  })
-  @Expose()
-  public id: string;
-
-
-  @ApiProperty({
-    description: 'User email',
-    example: 'user@user.local'
-  })
-  @Expose()
-  public email: string;
-
-  @ApiProperty({
     description: 'Access token',
-    example: 'user@user.local'
+    example: 'fsdfsd65fd6s5fsd6fsd6sljkasjf'
   })
   @Expose()
   public accessToken: string;

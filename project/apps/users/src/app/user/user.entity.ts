@@ -6,9 +6,12 @@ import { compare, genSalt, hash } from 'bcrypt';
 export class UserEntity implements AuthUser, Entity<string> {
   public id?: string;
   public email: string;
-  public firstname: string;
-  public lastname: string;
-  public dateOfBirth: Date;
+  public name: string;
+  public postsCount: number;
+  public likes: number;
+  public followers: number;
+  public following: number;
+  public dateRegistry: Date;
   public passwordHash: string;
 
   constructor(user: AuthUser) {
@@ -19,18 +22,26 @@ export class UserEntity implements AuthUser, Entity<string> {
     return {
       id: this.id,
       email: this.email,
-      firstname: this.firstname,
-      lastname: this.lastname,
-      dateOfBirth: this.dateOfBirth,
+      name: this.name,
+      postsCount: this.postsCount,
+      likes: this.likes,
+      followers: this.followers,
+      following: this.following,
+      dateRegistry: this.dateRegistry,
       passwordHash: this.passwordHash,
     };
   }
 
   public populate(data: AuthUser): void {
+    this.id = data.id;
     this.email = data.email;
-    this.firstname = data.firstname;
-    this.lastname = data.lastname;
-    this.dateOfBirth = data.dateOfBirth;
+    this.name = data.name;
+    this.postsCount = data.postsCount;
+    this.likes = data.likes;
+    this.followers = data.followers;
+    this.following = data.following;
+    this.dateRegistry = data.dateRegistry;
+    this.passwordHash = data.passwordHash
   }
 
   public async setPassword(password: string): Promise<UserEntity> {
@@ -41,5 +52,12 @@ export class UserEntity implements AuthUser, Entity<string> {
 
   public async comparePassword(password: string): Promise<boolean> {
     return compare(password, this.passwordHash);
+  }
+
+  static fromObject(data: any): UserEntity {
+    return new UserEntity({
+      ...data,
+      id: data._id?.toString(),
+    });
   }
 }

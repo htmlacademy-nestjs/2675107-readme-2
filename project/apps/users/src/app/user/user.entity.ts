@@ -54,7 +54,10 @@ export class UserEntity implements AuthUser, Entity<string> {
     return compare(password, this.passwordHash);
   }
 
-  static fromObject(data: AuthUser): UserEntity {
-    return new UserEntity(data);
+  static fromObject(data: any): UserEntity {
+    return new UserEntity({
+      ...data,
+      id: data._id?.toString(),
+    });
   }
 }

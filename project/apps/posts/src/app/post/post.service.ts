@@ -1,9 +1,7 @@
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PostRepository } from './post.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostEntity } from './post.entity';
-import { AUTH_USER_NOT_FOUND } from './post.constant';
 
 @Injectable()
 export class PostService {
@@ -11,18 +9,13 @@ export class PostService {
     private readonly postRepository: PostRepository
   ) {}
 
-  public async create(dto: CreatePostDto, userId: string) {
-
-    if (!userId) {
-      throw new NotFoundException(AUTH_USER_NOT_FOUND);
-    }
-
-    const postEntity = new PostEntity({
+  public async create(dto: CreatePostDto, authorId: string) {
+    const post = new PostEntity({
       ...dto,
-      userId,
+      authorId,
     });
 
-    return this.postRepository.save(postEntity);
+    return this.postRepository.save(post);
   }
 
   public async findById(id: string) {
@@ -35,7 +28,23 @@ export class PostService {
     return post;
   }
 
-  public async findAll() {
-    return this.postRepository.findAll();
+  public async findAllPublished() {
+    return this.postRepository.findPublished();
+  }
+
+  public async repost(postId: string, userId: string) {
+    const original = await this.findById(postId);
+
+    const repost = new PostEntity({
+      ...original.toPOJO(),
+      id: undefined,
+      authorId: userId,
+      originalAuthorId: original.authorId,
+      originalPostId: original.id,
+      isRepost: true,
+      publishedAt: new Date(),
+    });
+
+    return this.postRepository.save(repost);
   }
 }

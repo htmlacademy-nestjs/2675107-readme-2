@@ -13,31 +13,48 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-model Post {
-  id          String   @id @default(uuid()) @map("id")
-  categories  Category[]
-  title       String
-  description String
-  content     String
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  userId      String @map("user_id")
-  comments    Comment[]
-
-  @@index([title])
-  @@map("posts")
+enum PostType {
+  VIDEO
+  TEXT
+  QUOTE
+  PHOTO
+  LINK
 }
 
-model Category {
-  id        String  @id @default(uuid())
-  title     String
-  posts     Post[]
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+enum PostStatus {
+  PUBLISHED
+  DRAFT
+}
 
-  @@index([title])
-  @@map("categories")
+model Post {
+  id                String      @id @default(uuid())
+
+  type              PostType
+  status            PostStatus  @default(PUBLISHED)
+
+  title             String?
+  announcement      String?
+  content           String?
+  quoteAuthor       String?
+  videoUrl          String?
+  linkUrl           String?
+  linkDescription   String?
+  photoUrl          String?
+
+  authorId          String
+  originalPostId    String?
+  originalAuthorId  String?
+
+  isRepost          Boolean     @default(false)
+
+  tags              String[]
+
+  likesCount        Int         @default(0)
+  commentsCount     Int         @default(0)
+  comments          Comment[]
+
+  createdAt         DateTime    @default(now())
+  publishedAt       DateTime
 }
 
 model Comment {

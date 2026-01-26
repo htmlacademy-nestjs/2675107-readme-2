@@ -1,49 +1,54 @@
-import { Post } from '@project/shared/app/types';
 import { Entity } from '@project/shared/core';
+import { Post, PostStatus } from '@project/shared/app/types';
 
 export class PostEntity implements Post, Entity<string> {
   public id?: string;
-  public title: string;
-  public categories: Post['categories'];
-  public description: string;
-  public content: string;
-  public userId: string;
-  public comments: Post['comments'];
+
+  public type: Post['type'];
+  public status: PostStatus;
+
+  public authorId: string;
+  public originalAuthorId?: string;
+  public originalPostId?: string;
+  public isRepost: boolean;
+
+  public title?: string;
+  public announcement?: string;
+  public content?: string;
+  public quoteAuthor?: string;
+  public videoUrl?: string;
+  public linkUrl?: string;
+  public linkDescription?: string;
+  public photoUrl?: string;
+
+  public tags: string[];
+
+  public likesCount: number;
+  public commentsCount: number;
+
   public createdAt: Date;
-  public updatedAt: Date;
+  public publishedAt: Date;
 
   constructor(post: Partial<Post>) {
     this.populate(post);
+
     const now = new Date();
     this.createdAt = post.createdAt ?? now;
-    this.updatedAt = post.updatedAt ?? now;
-    this.comments = post.comments ?? [];
-    this.categories = post.categories ?? [];
+    this.publishedAt = post.publishedAt ?? now;
+
+    this.status = post.status ?? PostStatus.PUBLISHED;
+    this.isRepost = post.isRepost ?? false;
+
+    this.likesCount = post.likesCount ?? 0;
+    this.commentsCount = post.commentsCount ?? 0;
+    this.tags = post.tags ?? [];
+  }
+
+  public populate(data: Partial<Post>): void {
+    Object.assign(this, data);
   }
 
   public toPOJO(): Record<string, unknown> {
-  return {
-    id: this.id,
-    title: this.title,
-    description: this.description,
-    content: this.content,
-    userId: this.userId,
-    categories: this.categories,
-    comments: this.comments,
-    createdAt: this.createdAt,
-    updatedAt: this.updatedAt,
-  } as Record<string, unknown>;
-}
-
-  public populate(data: Partial<Post>): void {
-    this.id = data.id;
-    this.title = data.title;
-    this.description = data.description;
-    this.content = data.content;
-    this.userId = data.userId;
-    this.categories = data.categories;
-    this.comments = data.comments;
-    this.createdAt = data.createdAt;
-    this.updatedAt = data.updatedAt;
+    return { ...this } as Record<string, unknown>;
   }
 }

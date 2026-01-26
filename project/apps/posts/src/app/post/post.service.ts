@@ -11,15 +11,15 @@ export class PostService {
     private readonly postRepository: PostRepository
   ) {}
 
-  public async create(dto: CreatePostDto, authorId: string) {
+  public async create(dto: CreatePostDto, userId: string) {
 
-    if (!authorId) {
+    if (!userId) {
       throw new NotFoundException(AUTH_USER_NOT_FOUND);
     }
 
     const postEntity = new PostEntity({
       ...dto,
-      authorId,
+      userId,
     });
 
     return this.postRepository.save(postEntity);

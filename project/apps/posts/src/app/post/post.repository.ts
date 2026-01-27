@@ -40,8 +40,8 @@ export class PostRepository extends BasePrismaRepository<
     });
     return records.map((r) => new PostEntity({
       ...r,
-      type: r.type as unknown as PostType,      // приводим к твоему enum
-      status: r.status as unknown as PostStatus // если нужно для PostStatus
+      type: r.type as unknown as PostType,
+      status: r.status as unknown as PostStatus
     }));
   }
 
@@ -55,12 +55,8 @@ export class PostRepository extends BasePrismaRepository<
     });
     return records.map((r) => new PostEntity({
       ...r,
-      type: r.type as unknown as PostType,      // приводим к твоему enum
-      status: r.status as unknown as PostStatus // если нужно для PostStatus
-    }));return records.map((r) => new PostEntity({
-      ...r,
-      type: r.type as unknown as PostType,      // приводим к твоему enum
-      status: r.status as unknown as PostStatus // если нужно для PostStatus
+      type: r.type as unknown as PostType,
+      status: r.status as unknown as PostStatus
     }));
   }
 
@@ -71,12 +67,8 @@ export class PostRepository extends BasePrismaRepository<
     });
     return records.map((r) => new PostEntity({
       ...r,
-      type: r.type as unknown as PostType,      // приводим к твоему enum
-      status: r.status as unknown as PostStatus // если нужно для PostStatus
-    }));return records.map((r) => new PostEntity({
-      ...r,
-      type: r.type as unknown as PostType,      // приводим к твоему enum
-      status: r.status as unknown as PostStatus // если нужно для PostStatus
+      type: r.type as unknown as PostType,
+      status: r.status as unknown as PostStatus
     }));
   }
 }

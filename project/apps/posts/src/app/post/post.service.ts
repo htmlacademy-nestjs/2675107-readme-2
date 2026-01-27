@@ -2,39 +2,51 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PostRepository } from './post.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostEntity } from './post.entity';
+import { PostStatus } from '@project/shared/app/types';
 
 @Injectable()
 export class PostService {
-  constructor(
-    private readonly postRepository: PostRepository
-  ) {}
+  constructor(private readonly postRepository: PostRepository) {}
 
   public async create(dto: CreatePostDto, authorId: string) {
     const post = new PostEntity({
       ...dto,
       authorId,
     });
-
     return this.postRepository.save(post);
   }
 
   public async findById(id: string) {
     const post = await this.postRepository.findById(id);
-
-    if (!post) {
-      throw new NotFoundException('Post not found');
-    }
-
+    if (!post) throw new NotFoundException('Post not found');
     return post;
   }
 
-  public async findAllPublished() {
-    return this.postRepository.findPublished();
+  public async findAllPublished(page = 1, limit = 25) {
+    return this.postRepository.findPublished({ page, limit });
+  }
+
+  public async update(id: string, dto: Partial<CreatePostDto>, userId: string) {
+    const post = await this.findById(id);
+    if (post.authorId !== userId) {
+      throw new NotFoundException('Cannot edit this post');
+    }
+
+    post.populate(dto);
+    return this.postRepository.update(id, post);
+  }
+
+  public async delete(id: string, userId: string) {
+    const post = await this.findById(id);
+    if (post.authorId !== userId) {
+      throw new NotFoundException('Cannot delete this post');
+    }
+
+    await this.postRepository.deleteById(id);
   }
 
   public async repost(postId: string, userId: string) {
     const original = await this.findById(postId);
-
     const repost = new PostEntity({
       ...original.toPOJO(),
       id: undefined,
@@ -44,7 +56,14 @@ export class PostService {
       isRepost: true,
       publishedAt: new Date(),
     });
-
     return this.postRepository.save(repost);
+  }
+
+  public async findByAuthor(authorId: string, page = 1, limit = 25) {
+    return this.postRepository.findByAuthor(authorId, { page, limit });
+  }
+
+  public async findDrafts(userId: string) {
+    return this.postRepository.findByStatusAndAuthor(PostStatus.DRAFT, userId);
   }
 }

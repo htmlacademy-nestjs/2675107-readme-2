@@ -8,13 +8,18 @@ import { PostStatus } from '@project/shared/app/types';
 export class PostService {
   constructor(private readonly postRepository: PostRepository) {}
 
+  // public async create(dto: CreatePostDto, authorId: string) {
+  //   // const post = new PostEntity({
+  //   //   ...dto,
+  //   //   authorId,
+  //   // });
+  //   // return this.postRepository.save(post);
+  // }
+
   public async create(dto: CreatePostDto, authorId: string) {
-    const post = new PostEntity({
-      ...dto,
-      authorId,
-    });
-    return this.postRepository.save(post);
-  }
+  return this.postRepository.createPost(dto, authorId);
+}
+
 
   public async findById(id: string) {
     const post = await this.postRepository.findById(id);
@@ -31,8 +36,12 @@ export class PostService {
     if (post.authorId !== userId) {
       throw new NotFoundException('Cannot edit this post');
     }
+    const updateData = {
+      ...dto,
+      publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : undefined,
+    }
 
-    post.populate(dto);
+    post.populate(updateData);
     return this.postRepository.update(id, post);
   }
 

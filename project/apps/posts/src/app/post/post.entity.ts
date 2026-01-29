@@ -1,25 +1,16 @@
 import { Entity } from '@project/shared/core';
-import { Post, PostStatus } from '@project/shared/app/types';
+import { PostMeta, PostStatus } from '@project/shared/app/types';
 
-export class PostEntity implements Post, Entity<string> {
+export class PostEntity implements PostMeta, Entity<string> {
   public id?: string;
 
-  public type: Post['type'];
+  public type: PostMeta['type'];
   public status: PostStatus;
 
   public authorId: string;
   public originalAuthorId?: string;
   public originalPostId?: string;
   public isRepost: boolean;
-
-  public title?: string;
-  public announcement?: string;
-  public content?: string;
-  public quoteAuthor?: string;
-  public videoUrl?: string;
-  public linkUrl?: string;
-  public linkDescription?: string;
-  public photoUrl?: string;
 
   public tags: string[];
 
@@ -29,7 +20,7 @@ export class PostEntity implements Post, Entity<string> {
   public createdAt: Date;
   public publishedAt: Date;
 
-  constructor(post: Partial<Post>) {
+  constructor(post: Partial<PostMeta>) {
     this.populate(post);
 
     const now = new Date();
@@ -44,7 +35,7 @@ export class PostEntity implements Post, Entity<string> {
     this.tags = post.tags ?? [];
   }
 
-  public populate(data: Partial<Post>): void {
+  public populate(data: Partial<PostMeta>): void {
     Object.assign(this, data);
   }
 

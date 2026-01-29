@@ -10,6 +10,7 @@ export abstract class BasePrismaRepository<
 > implements Repository<EntityType> {
 
   constructor(
+    protected readonly client: any,
     protected readonly prisma: PrismaModel,
     private readonly createEntity: (data: any) => EntityType,
   ) {}
@@ -21,6 +22,13 @@ export abstract class BasePrismaRepository<
 
     return this.createEntity(data);
   }
+
+  protected async withTransaction<T>(
+    handler: (tx: any) => Promise<T>,
+  ): Promise<T> {
+    return this.client.$transaction(handler);
+  }
+
 
   public async findById(id: EntityType['id']): Promise<EntityType | null> {
     const record = await (this.prisma as any).findUnique({

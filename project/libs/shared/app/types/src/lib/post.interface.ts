@@ -12,10 +12,7 @@ export enum PostType {
   LINK = 'LINK',
 }
 
-
-
-
-export interface Post {
+export interface PostMeta {
   id?: string;
 
   type: PostType;
@@ -26,15 +23,6 @@ export interface Post {
   originalPostId?: string;
   isRepost: boolean;
 
-  title?: string;
-  announcement?: string;
-  content?: string;
-  quoteAuthor?: string;
-  videoUrl?: string;
-  linkUrl?: string;
-  linkDescription?: string;
-  photoUrl?: string;
-
   tags: string[];
 
   likesCount: number;
@@ -43,3 +31,35 @@ export interface Post {
   createdAt?: Date;
   publishedAt?: Date;
 }
+
+export interface PostVideo {
+  postId: string;
+  title: string;
+  videoUrl: string;
+}
+
+export interface PostText {
+  postId: string;
+  title: string;
+  announcement: string;
+  content: string;
+}
+
+export interface PostQuote {
+  postId: string;
+  quote: string;
+  quoteAuthor: string;
+}
+
+export interface PostPhoto {
+  postId: string;
+  photoUrl: string;
+}
+
+
+export interface PostLink {
+  postId: string;
+  linkUrl: string;
+  linkDescription?: string;
+}
+

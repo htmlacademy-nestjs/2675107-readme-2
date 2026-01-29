@@ -27,34 +27,72 @@ enum PostStatus {
 }
 
 model Post {
-  id                String      @id @default(uuid())
+  id               String      @id @default(uuid())
 
-  type              PostType
-  status            PostStatus  @default(PUBLISHED)
+  type             PostType
+  status           PostStatus  @default(PUBLISHED)
 
-  title             String?
-  announcement      String?
-  content           String?
-  quoteAuthor       String?
-  videoUrl          String?
-  linkUrl           String?
-  linkDescription   String?
-  photoUrl          String?
+  authorId         String
+  originalPostId   String?
+  originalAuthorId String?
+  isRepost         Boolean     @default(false)
 
-  authorId          String
-  originalPostId    String?
-  originalAuthorId  String?
+  tags             String[]
 
-  isRepost          Boolean     @default(false)
+  likesCount       Int         @default(0)
+  commentsCount    Int         @default(0)
 
-  tags              String[]
+  createdAt        DateTime    @default(now())
+  publishedAt      DateTime
 
-  likesCount        Int         @default(0)
-  commentsCount     Int         @default(0)
-  comments          Comment[]
+  // связи 1:1
+  video            PostVideo?
+  text             PostText?
+  quote            PostQuote?
+  photo            PostPhoto?
+  link             PostLink?
 
-  createdAt         DateTime    @default(now())
-  publishedAt       DateTime
+  comments         Comment[]
+}
+
+model PostVideo {
+  postId    String  @id
+  title     String
+  videoUrl  String
+
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model PostText {
+  postId        String  @id
+  title         String
+  announcement  String
+  content       String
+
+  post          Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model PostQuote {
+  postId        String  @id
+  quote         String
+  quoteAuthor   String
+
+  post          Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model PostPhoto {
+  postId    String  @id
+  photoUrl  String
+
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model PostLink {
+  postId          String  @id
+  linkUrl         String
+  linkDescription String?
+
+  post            Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Comment {

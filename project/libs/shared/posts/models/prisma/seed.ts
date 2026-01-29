@@ -1,102 +1,160 @@
-// import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
-// const FIRST_CATEGORY_UUID = '39614113-7ad5-45b6-8093-06455437e1e2';
-// const SECOND_CATEGORY_UUID = 'efd775e2-df55-4e0e-a308-58249f5ea202';
+const FIRST_USER_ID = '658170cbb954e9f5b905ccf4';
+const SECOND_USER_ID = '6581762309c030b503e30512';
 
-// const FIRST_POST_UUID = '6d308040-96a2-4162-bea6-2338e9976540';
-// const SECOND_POST_UUID = 'ab04593b-da99-4fe3-8b4b-e06d82e2efdd';
+export enum PostType {
+  VIDEO = 'VIDEO',
+  TEXT = 'TEXT',
+  QUOTE = 'QUOTE',
+  PHOTO = 'PHOTO',
+  LINK = 'LINK',
+}
 
-// const FIRST_USER_ID = '658170cbb954e9f5b905ccf4';
-// const SECOND_USER_ID = '6581762309c030b503e30512';
+function getPosts() {
+  return [
+    {
+      type: PostType.TEXT,
+      title: 'Худеющий',
+      announcement: 'На мой взгляд, это один из самых страшных романов Стивена Кинга.',
+      content: 'Недавно прочитал страшный роман «Худеющий».',
+      authorId: FIRST_USER_ID,
+      tags: ['книги', 'ужасы'],
+      comments: [
+        { message: 'Очень интересная книга!', userId: FIRST_USER_ID },
+        { message: 'Хочу прочитать.', userId: SECOND_USER_ID },
+      ],
+    },
+    {
+      type: PostType.VIDEO,
+      title: 'JavaScript для начинающих',
+      videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      authorId: FIRST_USER_ID,
+      tags: ['js', 'обучение'],
+      comments: [
+        { message: 'Отличное видео!', userId: FIRST_USER_ID },
+      ],
+    },
+    {
+      type: PostType.QUOTE,
+      quote: 'Учение — свет, а неучение — тьма.',
+      quoteAuthor: 'Сократ',
+      authorId: SECOND_USER_ID,
+      tags: ['цитаты', 'философия'],
+    },
+    {
+      type: PostType.PHOTO,
+      photoUrl: 'https://example.com/photo.jpg',
+      authorId: SECOND_USER_ID,
+      tags: ['фото', 'пейзаж'],
+    },
+    {
+      type: PostType.LINK,
+      linkUrl: 'https://nestjs.com/',
+      linkDescription: 'Документация по NestJS',
+      authorId: FIRST_USER_ID,
+      tags: ['nestjs', 'backend'],
+    },
+  ];
+}
 
-// function getCategories() {
-//   return [
-//     { id: FIRST_CATEGORY_UUID, title: 'Книги' },
-//     { id: SECOND_CATEGORY_UUID, title: 'Компьютеры' },
-//   ];
-// }
+function assertDefined<T>(value: T | undefined, fieldName: string): T {
+  if (value === undefined) {
+    throw new Error(`Field ${fieldName} is required but got undefined`);
+  }
+  return value;
+}
 
-// function getPosts() {
-//   return [
-//     {
-//       id: FIRST_POST_UUID,
-//       title: 'Худеющий',
-//       userId: FIRST_USER_ID,
-//       content: 'Недавно прочитал страшный роман «Худеющий».',
-//       description: 'На мой взгляд, это один из самых страшных романов Стивена Кинга.',
-//       categories: {
-//         connect: [{ id: FIRST_CATEGORY_UUID }],
-//       },
-//     },
-//     {
-//       id: SECOND_POST_UUID,
-//       title: 'Вы не знаете JavaScript',
-//       userId: FIRST_USER_ID,
-//       content: 'Полезная книга по JavaScript',
-//       description: 'Секреты и тайные знания по JavaScript.',
-//       categories: {
-//         connect: [
-//           { id: FIRST_CATEGORY_UUID },
-//           { id: SECOND_CATEGORY_UUID },
-//         ]
-//       },
-//       comments: [
-//           {
-//             message: 'Это действительно отличная книга!',
-//             userId: FIRST_USER_ID,
-//           },
-//           {
-//             message: 'Надо будет обязательно перечитать. Слишком много информации.',
-//             userId: SECOND_USER_ID,
-//           }
-//       ]
-//     }
-//   ]
-// }
+async function seedDb(prisma: PrismaClient) {
+  const posts = getPosts();
 
-// async function seedDb(prismaClient: PrismaClient) {
-//   const mockCategories = getCategories();
-//   for (const category of mockCategories) {
-//     await prismaClient.category.upsert({
-//       where: { id: category.id },
-//       update: {},
-//       create: {
-//         id: category.id,
-//         title: category.title
-//       }
-//     });
-//   }
+  for (const p of posts) {
+    const postMeta = await prisma.post.create({
+      data: {
+        type: assertDefined(p.type, 'type'),
+        status: 'PUBLISHED',
+        authorId: p.authorId,
+        tags: p.tags ?? [],
+        publishedAt: new Date(),
+      },
+    });
+    switch (p.type) {
+      case 'TEXT':
+        await prisma.postText.create({
+          data: {
+            postId: postMeta.id,
+            title: assertDefined(p.title, 'title'),
+            announcement: assertDefined(p.announcement, 'announcement'),
+            content: assertDefined(p.content, 'content'),
+          },
+        });
+        break;
 
-//   const mockPosts = getPosts();
-//   for (const post of mockPosts) {
-//     await prismaClient.post.create({
-//       data: {
-//         id: post.id,
-//         title: post.title,
-//         description: post.description,
-//         content: post.description,
-//         categories: post.categories,
-//         userId: post.userId,
-//         comments: post.comments ? {
-//           create: post.comments
-//         } : undefined
-//       }
-//     })
-//   }
+      case 'VIDEO':
+        await prisma.postVideo.create({
+          data: {
+            postId: postMeta.id,
+            title: assertDefined(p.title, 'title'),
+            videoUrl: assertDefined(p.videoUrl, 'videoUrl'),
+          },
+        });
+        break;
 
-//   console.info('🤘️ Database was filled');
-// }
+      case 'QUOTE':
+        await prisma.postQuote.create({
+          data: {
+            postId: postMeta.id,
+            quote: assertDefined(p.quote, 'quote'),
+            quoteAuthor: assertDefined(p.quoteAuthor, 'quoteAuthor'),
+          },
+        });
+        break;
 
-// async function bootstrap() {
-//   const prismaClient = new PrismaClient();
+      case 'PHOTO':
+        await prisma.postPhoto.create({
+          data: {
+            postId: postMeta.id,
+            photoUrl: assertDefined(p.photoUrl, 'photoUrl'),
+          },
+        });
+        break;
 
-//   try {
-//     await seedDb(prismaClient);
-//   } catch (error: unknown) {
-//     console.error(error);
-//   } finally {
-//     await prismaClient.$disconnect();
-//   }
-// }
+      case 'LINK':
+        await prisma.postLink.create({
+          data: {
+            postId: postMeta.id,
+            linkUrl: assertDefined(p.linkUrl, 'linkUrl'),
+            linkDescription: p.linkDescription,
+          },
+        });
+        break;
+    }
+    if (p.comments?.length) {
+      for (const c of p.comments) {
+        await prisma.comment.create({
+          data: {
+            postId: postMeta.id,
+            message: c.message,
+            userId: c.userId,
+          },
+        });
+      }
+    }
+  }
 
-// bootstrap();
+  console.info('✅ Database seeded successfully!');
+}
+
+async function bootstrap() {
+  const prisma = new PrismaClient();
+
+  try {
+    await seedDb(prisma);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+bootstrap();

@@ -22,14 +22,6 @@ export class PostRepository extends BasePrismaRepository<
     authorId: string,
   ): Promise<PostEntity> {
     return this.withTransaction(async (tx) => {
-      console.log('SENDING TO PRISMA:', {
-    type: dto.type,
-    status: PostStatus.PUBLISHED,
-    authorId,
-    tags: dto.tags ?? [],
-    publishedAt: new Date(),
-});
-
       const post = await tx.post.create({
         data: {
           type: dto.type,

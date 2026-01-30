@@ -8,14 +8,6 @@ import { PostStatus } from '@project/shared/app/types';
 export class PostService {
   constructor(private readonly postRepository: PostRepository) {}
 
-  // public async create(dto: CreatePostDto, authorId: string) {
-  //   // const post = new PostEntity({
-  //   //   ...dto,
-  //   //   authorId,
-  //   // });
-  //   // return this.postRepository.save(post);
-  // }
-
   public async create(dto: CreatePostDto, authorId: string) {
   return this.postRepository.createPost(dto, authorId);
 }
@@ -27,8 +19,8 @@ export class PostService {
     return post;
   }
 
-  public async findAllPublished(page = 1, limit = 25) {
-    return this.postRepository.findPublished({ page, limit });
+  public async findAllPublished() {
+    return this.postRepository.find();
   }
 
   public async update(id: string, dto: Partial<CreatePostDto>, userId: string) {
@@ -68,11 +60,11 @@ export class PostService {
     return this.postRepository.save(repost);
   }
 
-  public async findByAuthor(authorId: string, page = 1, limit = 25) {
-    return this.postRepository.findByAuthor(authorId, { page, limit });
+  public async findByAuthor(authorId: string) {
+    return this.postRepository.find({ authorId: authorId});
   }
 
   public async findDrafts(userId: string) {
-    return this.postRepository.findByStatusAndAuthor(PostStatus.DRAFT, userId);
+    return this.postRepository.find({status: PostStatus.DRAFT, authorId: userId});
   }
 }

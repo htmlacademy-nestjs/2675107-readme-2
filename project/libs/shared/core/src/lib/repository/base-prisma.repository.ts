@@ -1,76 +1,41 @@
-import { NotFoundException } from '@nestjs/common';
 import { Repository } from './repository.interface';
-import { Entity, EntityIdType } from './entity.interface';
+import { DefaultPojoType, Entity, EntityIdType } from './entity.interface';
+import { PrismaClientService } from '@project/shared/posts/models'
 
 export abstract class BasePrismaRepository<
-  EntityType extends Entity<EntityIdType>,
-  PrismaModel,
-  PrismaCreateInput,
-  PrismaUpdateInput
-> implements Repository<EntityType> {
+  EntityType extends Entity<EntityIdType, DocumentType>,
+  DocumentType = DefaultPojoType,
+> implements Repository<EntityType, DocumentType> {
 
   constructor(
-    protected readonly client: any,
-    protected readonly prisma: PrismaModel,
-    private readonly createEntity: (data: any) => EntityType,
+    protected readonly client: PrismaClientService,
+    private readonly createEntity: (document: DocumentType) => EntityType,
   ) {}
 
-  protected toEntity(data: any): EntityType | null {
-    if (!data) {
+  protected createEntityFromDocument(document: DocumentType): EntityType | null {
+    if (!document) {
       return null;
     }
 
-    return this.createEntity(data);
+    return this.createEntity(document);
   }
-
-  protected async withTransaction<T>(
-    handler: (tx: any) => Promise<T>,
-  ): Promise<T> {
-    return this.client.$transaction(handler);
-  }
-
 
   public async findById(id: EntityType['id']): Promise<EntityType | null> {
-    const record = await (this.prisma as any).findUnique({
-      where: { id },
-    });
-
-    return this.toEntity(record);
+    throw new Error('Not implemented');
   }
 
   public async save(entity: EntityType): Promise<EntityType> {
-    const record = await (this.prisma as any).create({
-      data: entity.toPOJO() as PrismaCreateInput,
-    });
-
-    entity.id = record.id;
-    return entity;
+   throw new Error('Not implemented');
   }
 
   public async update(
     id: EntityType['id'],
     entity: EntityType,
   ): Promise<EntityType> {
-    try {
-      await (this.prisma as any).update({
-        where: { id },
-        data: entity.toPOJO() as PrismaUpdateInput,
-      });
-
-      return entity;
-    } catch (error) {
-      console.log(error);
-      throw new NotFoundException(`Entity with id ${id} not found`);
-    }
+   throw new Error('Not implemented');
   }
 
   public async deleteById(id: EntityType['id']): Promise<void> {
-    try {
-      await (this.prisma as any).delete({
-        where: { id },
-      });
-    } catch {
-      throw new NotFoundException(`Entity with id ${id} not found`);
-    }
+    throw new Error('Not implemented');
   }
 }

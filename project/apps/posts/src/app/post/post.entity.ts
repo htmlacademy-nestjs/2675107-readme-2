@@ -42,4 +42,8 @@ export class PostEntity implements PostMeta, Entity<string> {
   public toPOJO(): Record<string, unknown> {
     return { ...this } as Record<string, unknown>;
   }
+
+  static fromObject(data: PostMeta): PostEntity {
+    return new PostEntity(data);
+  }
 }

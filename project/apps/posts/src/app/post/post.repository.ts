@@ -1,27 +1,80 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientService } from '@project/shared/posts/models';
 import { PostEntity } from './post.entity';
-import { PostStatus, PostType } from '@project/shared/app/types';
+import { PostMeta, PostStatus, PostType } from '@project/shared/app/types';
 import { BasePrismaRepository } from '@project/shared/core';
-import { Prisma } from '@prisma/client';
 import { CreatePostDto } from './dto/create-post.dto';
+import { MAX_POST_LIMIT } from './post.constant';
+import { PostFilter, postFilterToPrisma } from './post-category.filter';
 
 @Injectable()
 export class PostRepository extends BasePrismaRepository<
   PostEntity,
-  PrismaClientService['post'],
-  any,
-  any
+  PostMeta
 > {
-  constructor(prisma: PrismaClientService) {
-    super(prisma, prisma.post, (data) => new PostEntity(data));
+  constructor(
+    protected readonly client: PrismaClientService
+  ) {
+    super(client, PostEntity.fromObject);
+  }
+
+  public async save(entity: PostEntity): Promise<PostEntity> {
+    const record = await this.client.post.create({
+      data: { ...entity.toPOJO() }
+    });
+
+    entity.id = record.id;
+    return entity;
+  }
+
+  public async findById(id: string): Promise<PostEntity> {
+    const document = await this.client.post.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (! document) {
+      throw new NotFoundException(`Category with id ${id} not found.`);
+    }
+
+    return this.createEntityFromDocument(document);
+  }
+
+  public async find(filter?: PostFilter): Promise<PostEntity[]> {
+    const where = filter ?? postFilterToPrisma(filter);
+
+    const documents = await this.client.post.findMany({
+      where,
+      take: MAX_POST_LIMIT
+    });
+
+    return documents.map((document) => this.createEntityFromDocument(document));
+  }
+
+  public async deleteById(id: string): Promise<void> {
+    await this.client.post.delete({
+      where: {
+        id,
+      }
+    });
+  }
+
+  public async update(id: string, entity: PostEntity): Promise<PostEntity> {
+    const updatedCategory = await this.client.post.update({
+      where: { id },
+      data: {
+      }
+    });
+
+    return this.createEntityFromDocument(updatedCategory);
   }
 
   public async createPost(
     dto: CreatePostDto,
     authorId: string,
   ): Promise<PostEntity> {
-    return this.withTransaction(async (tx) => {
+    return this.client.$transaction(async (tx) => {
       const post = await tx.post.create({
         data: {
           type: dto.type,
@@ -87,61 +140,4 @@ export class PostRepository extends BasePrismaRepository<
       return new PostEntity(post);
     });
   }
-
-  public async findAll(options?: { page?: number; limit?: number }): Promise<PostEntity[]> {
-    const { page = 1, limit = 25 } = options || {};
-    const records = await this.prisma.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: { publishedAt: 'desc' } as Prisma.PostOrderByWithRelationInput,
-    });
-    return records.map((r) => new PostEntity({
-      ...r,
-      type: r.type as unknown as PostType,
-      status: r.status as unknown as PostStatus
-    }));
-  }
-
-  public async findPublished(options?: { page?: number; limit?: number }): Promise<PostEntity[]> {
-    const { page = 1, limit = 25 } = options || {};
-    const records = await this.prisma.findMany({
-      where: { status: PostStatus.PUBLISHED } as Prisma.PostWhereInput,
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: { publishedAt: 'desc' } as Prisma.PostOrderByWithRelationInput,
-    });
-    return records.map((r) => new PostEntity({
-      ...r,
-      type: r.type as unknown as PostType,
-      status: r.status as unknown as PostStatus
-    }));
-  }
-
-  public async findByAuthor(authorId: string, options?: { page?: number; limit?: number }): Promise<PostEntity[]> {
-    const { page = 1, limit = 25 } = options || {};
-    const records = await this.prisma.findMany({
-      where: { authorId } as Prisma.PostWhereInput,
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: { publishedAt: 'desc' } as Prisma.PostOrderByWithRelationInput,
-    });
-    return records.map((r) => new PostEntity({
-      ...r,
-      type: r.type as unknown as PostType,
-      status: r.status as unknown as PostStatus
-    }));
-  }
-
-  public async findByStatusAndAuthor(status: PostStatus, authorId: string): Promise<PostEntity[]> {
-    const records = await this.prisma.findMany({
-      where: { status, authorId } as Prisma.PostWhereInput,
-      orderBy: { publishedAt: 'desc' } as Prisma.PostOrderByWithRelationInput,
-    });
-    return records.map((r) => new PostEntity({
-      ...r,
-      type: r.type as unknown as PostType,
-      status: r.status as unknown as PostStatus
-    }));
-  }
-
 }

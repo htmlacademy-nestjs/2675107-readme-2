@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Delete, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -12,6 +12,7 @@ export class PostController {
 
   @ApiResponse({ status: 201 })
   @Post()
+  @HttpCode(HttpStatus.NO_CONTENT)
   public async create(@Body() dto: CreatePostDto) {
     const post = await this.postService.create(dto, 'user-id-1');
     return fillDto(PostRdo, post.toPOJO());
@@ -24,8 +25,8 @@ export class PostController {
   }
 
   @Get()
-  public async index(@Query('page') page?: number, @Query('limit') limit?: number) {
-    const posts = await this.postService.findAllPublished(page, limit);
+  public async index() {
+    const posts = await this.postService.findAllPublished();
     return posts.map((p) => fillDto(PostRdo, p.toPOJO()));
   }
 

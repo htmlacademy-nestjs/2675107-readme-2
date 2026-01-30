@@ -34,7 +34,7 @@ export class PostService {
     }
 
     post.populate(updateData);
-    return this.postRepository.update(id, post);
+    return this.postRepository.update(id);
   }
 
   public async delete(id: string, userId: string) {

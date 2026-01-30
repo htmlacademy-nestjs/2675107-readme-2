@@ -60,7 +60,7 @@ export class PostRepository extends BasePrismaRepository<
     });
   }
 
-  public async update(id: string, entity: PostEntity): Promise<PostEntity> {
+  public async update(id: string): Promise<PostEntity> {
     const updatedCategory = await this.client.post.update({
       where: { id },
       data: {

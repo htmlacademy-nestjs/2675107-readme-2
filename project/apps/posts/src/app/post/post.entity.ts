@@ -1,7 +1,7 @@
 import { Entity } from '@project/shared/core';
 import { PostMeta, PostStatus } from '@project/shared/app/types';
 
-export class PostEntity implements PostMeta, Entity<string> {
+export class PostEntity implements PostMeta, Entity<string, PostMeta> {
   public id?: string;
 
   public type: PostMeta['type'];
@@ -39,9 +39,23 @@ export class PostEntity implements PostMeta, Entity<string> {
     Object.assign(this, data);
   }
 
-  public toPOJO(): Record<string, unknown> {
-    return { ...this } as Record<string, unknown>;
-  }
+  public toPOJO(): PostMeta {
+  return {
+    id: this.id,
+    type: this.type,
+    status: this.status,
+    authorId: this.authorId,
+    originalAuthorId: this.originalAuthorId,
+    originalPostId: this.originalPostId,
+    isRepost: this.isRepost,
+    tags: this.tags,
+    likesCount: this.likesCount,
+    commentsCount: this.commentsCount,
+    createdAt: this.createdAt,
+    publishedAt: this.publishedAt,
+  };
+}
+
 
   static fromObject(data: PostMeta): PostEntity {
     return new PostEntity(data);

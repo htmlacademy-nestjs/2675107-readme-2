@@ -12,7 +12,7 @@ export abstract class BasePrismaRepository<
     private readonly createEntity: (document: DocumentType) => EntityType,
   ) {}
 
-  protected createEntityFromDocument(document: DocumentType): EntityType | null {
+  protected createEntityFromDocument(document: DocumentType): EntityType {
     if (!document) {
       return null;
     }

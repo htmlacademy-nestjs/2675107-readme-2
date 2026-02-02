@@ -1,10 +1,10 @@
 import { Entity } from '@project/shared/core';
-import { PostMeta, PostStatus } from '@project/shared/app/types';
+import { PostMeta, PostStatus, PostType } from '@project/shared/app/types';
 
 export class PostEntity implements PostMeta, Entity<string, PostMeta> {
   public id?: string;
 
-  public type: PostMeta['type'];
+  public type: PostType;
   public status: PostStatus;
 
   public authorId: string;
@@ -58,6 +58,10 @@ export class PostEntity implements PostMeta, Entity<string, PostMeta> {
 
 
   static fromObject(data: PostMeta): PostEntity {
-    return new PostEntity(data);
+    return new PostEntity({
+      ...data,
+      type: data.type as unknown as PostType,
+      status: data.status as unknown as PostStatus,
+    });
   }
 }

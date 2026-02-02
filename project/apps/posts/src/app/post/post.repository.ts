@@ -18,14 +18,14 @@ export class PostRepository extends BasePrismaRepository<
     super(client, PostEntity.fromObject);
   }
 
-  public async save(entity: PostEntity): Promise<PostEntity> {
-    const record = await this.client.post.create({
-      data: { ...entity.toPOJO() }
-    });
+  // public async save(entity: PostEntity): Promise<PostEntity> {
+  //   const record = await this.client.post.create({
+  //     data: { ...entity.toPOJO() }
+  //   });
 
-    entity.id = record.id;
-    return entity;
-  }
+  //   entity.id = record.id;
+  //   return entity;
+  // }
 
   public async findById(id: string): Promise<PostEntity> {
     const document = await this.client.post.findFirst({
@@ -38,7 +38,11 @@ export class PostRepository extends BasePrismaRepository<
       throw new NotFoundException(`Category with id ${id} not found.`);
     }
 
-    return this.createEntityFromDocument(document);
+    return this.createEntityFromDocument({
+      ...document,
+      type: document.type as PostType,
+      status: document.status as PostStatus
+    });
   }
 
   public async find(filter?: PostFilter): Promise<PostEntity[]> {
@@ -49,7 +53,11 @@ export class PostRepository extends BasePrismaRepository<
       take: MAX_POST_LIMIT
     });
 
-    return documents.map((document) => this.createEntityFromDocument(document));
+    return documents.map((document) => this.createEntityFromDocument({
+      ...document,
+      type: document.type as PostType,
+      status: document.status as PostStatus
+    }));
   }
 
   public async deleteById(id: string): Promise<void> {
@@ -67,7 +75,11 @@ export class PostRepository extends BasePrismaRepository<
       }
     });
 
-    return this.createEntityFromDocument(updatedCategory);
+    return this.createEntityFromDocument({
+      ...updatedCategory,
+      type: updatedCategory.type as PostType,
+      status: updatedCategory.status as PostStatus
+    });
   }
 
   public async createPost(
@@ -137,7 +149,11 @@ export class PostRepository extends BasePrismaRepository<
           break;
       }
 
-      return new PostEntity(post);
+      return this.createEntityFromDocument({
+        ...post,
+        type: post.type as PostType,
+        status: post.status as PostStatus
+      });
     });
   }
 }

@@ -1,22 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { CreateLinkPostDto } from "./create-link-post.dto";
+import { CreatePhotoPostDto } from "./create-photo-post.dto";
+import { CreateQuotePostDto } from "./create-quote-post.dto";
+import { CreateTextPostDto } from "./create-text-post.dto";
+import { CreateVideoPostDto } from "./create-video-post.dto";
 
-export class CreatePostDto {
-  @ApiProperty({
-    description: 'Post title',
-    example: 'How to learn NestJS'
-  })
-  public title: string;
-
-  @ApiProperty({
-    description: 'Post content',
-    example: 'NestJS is a progressive Node.js framework...'
-  })
-  public content: string;
-
-  @ApiProperty({
-    description: 'Post tags',
-    example: ['nestjs', 'backend'],
-    required: false
-  })
-  public tags?: string[];
-}
+export type CreatePostDto =
+  | CreateVideoPostDto
+  | CreateTextPostDto
+  | CreateQuotePostDto
+  | CreatePhotoPostDto
+  | CreateLinkPostDto;

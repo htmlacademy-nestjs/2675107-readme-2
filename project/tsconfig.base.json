@@ -21,6 +21,9 @@
       ],
       "@project/shared/config/users": ["libs/shared/config/users/src/index.ts"],
       "@project/shared/core": ["libs/shared/core/src/index.ts"],
+      "@project/shared/core/shared-pipes": [
+        "libs/shared/core/shared-pipes/src/index.ts"
+      ],
       "@project/shared/helpers": ["libs/shared/helpers/src/index.ts"],
       "@project/shared/posts/models": ["libs/shared/posts/models/src/index.ts"]
     }

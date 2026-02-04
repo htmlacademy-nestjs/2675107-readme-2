@@ -7,12 +7,14 @@ const ENVIRONMENTS = ['development', 'production', 'stage'] as const;
 type Environment = typeof ENVIRONMENTS[number];
 
 export interface FileVaultConfig {
+  serveRoot: string;
   environment: string;
   port: number;
   uploadDirectory: string;
 }
 
 const validationSchema = Joi.object({
+  serveRoot: Joi.string().required(),
   environment: Joi.string().valid(...ENVIRONMENTS).required(),
   port: Joi.number().port().default(DEFAULT_PORT),
   uploadDirectory: Joi.string().required(),
@@ -27,6 +29,7 @@ function validateConfig(config: FileVaultConfig): void {
 
 function getConfig(): FileVaultConfig {
   const config: FileVaultConfig = {
+    serveRoot: process.env.SERVE_ROOT,
     environment: process.env.NODE_ENV as Environment,
     port: parseInt(process.env.PORT || `${DEFAULT_PORT}`, 10),
     uploadDirectory: process.env.UPLOAD_DIRECTORY_PATH,

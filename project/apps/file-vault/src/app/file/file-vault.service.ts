@@ -25,13 +25,16 @@ export class FileVaultService {
   }
 
   private getDestinationFilePath(filename: string): string {
-    return join(this.getUploadDirectoryPath(), filename)
+    return join(this.getUploadDirectoryPath(), filename);
   }
 
   public async saveFile(file: Express.Multer.File): Promise<string> {
     try {
       const uploadDirectoryPath = this.getUploadDirectoryPath();
-      const destinationFile = this.getDestinationFilePath(file.originalname);
+      const fileName = randomUUID();
+      const fileExtension = extension(file.mimetype);
+
+      const destinationFile = this.getDestinationFilePath(`${fileName}.${fileExtension}`);
 
       await ensureDir(uploadDirectoryPath);
       await writeFile(destinationFile, new Uint8Array(file.buffer));

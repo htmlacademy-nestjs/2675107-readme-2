@@ -27,12 +27,6 @@ export class UserModel extends Document implements AuthUser {
     required: true,
     default: 0
   })
-  public likes: number;
-
-  @Prop({
-    required: true,
-    default: 0
-  })
   public postsCount: number;
 
   @Prop({

@@ -20,8 +20,7 @@ export class AuthenticationService {
     const {email, name, password} = dto;
 
     const user = {
-      email, name, avatar: '', passwordHash: '', postsCount: 0,
-      likes: 0, followers: 0, following: 0, dateRegistry: new Date
+      email, name, avatar: '', passwordHash: '', postsCount: 0, followers: 0, following: 0, dateRegistry: new Date
     };
 
     const existUser = await this.userRepository

@@ -5,7 +5,6 @@ export interface User {
   avatar?: string;
 
   postsCount: number;
-  likes: number,
   followers: number,
   following: number
 

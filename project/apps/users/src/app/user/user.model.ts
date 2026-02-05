@@ -7,7 +7,9 @@ import { AuthUser } from '@project/shared/app/types';;
   timestamps: true,
 })
 export class UserModel extends Document implements AuthUser {
-  @Prop()
+  @Prop({
+    default: ''
+  })
   public avatar: string;
 
   @Prop({

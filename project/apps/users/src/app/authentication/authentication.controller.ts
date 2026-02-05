@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRdo } from './rdo/user.rdo';
@@ -9,6 +9,7 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ShowUserRdo } from './rdo/show-user.rdo';
 import { MongoIdValidationPipe } from '@project/shared/core/shared-pipes'
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ChangePasswordDto } from './dto/change-password-user.dto';
 
 @ApiTags('authentication')
 @Controller('auth')
@@ -40,7 +41,7 @@ export class AuthenticationController {
   public async login(@Body() dto: LoginUserDto) {
     const verifiedUser = await this.authService.verifyUser(dto);
     const userToken = await this.authService.createUserToken(verifiedUser);
-    return fillDto(LoggedUserRdo, { ...verifiedUser.toPOJO(), ...userToken });
+    return fillDto(LoggedUserRdo, { ...verifiedUser, ...userToken });
   }
 
   @ApiResponse({
@@ -53,5 +54,19 @@ export class AuthenticationController {
   public async show(@Param('id', MongoIdValidationPipe) id: string) {
     const existUser = await this.authService.getUser(id);
     return fillDto(ShowUserRdo, existUser.toPOJO());
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Post('change-password')
+  public async changePassword(
+    @Req() req,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    const userId = req.user.sub;
+
+    await this.authService.changePassword(userId, dto);
+
+    return { message: 'Password successfully changed' };
   }
 }

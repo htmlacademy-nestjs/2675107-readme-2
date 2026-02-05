@@ -50,7 +50,7 @@ export class AuthenticationService {
       throw new UnauthorizedException(AUTH_USER_PASSWORD_WRONG);
     }
 
-    return {accessToken: 'token'};
+    return existUser;
   }
 
   public async getUser(id: string) {
@@ -77,5 +77,24 @@ export class AuthenticationService {
       this.logger.error('[Token generation error]: ' + error.message);
       throw new HttpException('Ошибка при создании токена.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  public async changePassword(
+    userId: string,
+    dto: { currentPassword: string; newPassword: string }
+  ) {
+    const user = await this.userRepository.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(AUTH_USER_NOT_FOUND);
+    }
+
+    const isPasswordValid = await user.comparePassword(dto.currentPassword);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException(AUTH_USER_PASSWORD_WRONG);
+    }
+
+    await user.setPassword(dto.newPassword);
+    await this.userRepository.update(userId, user);
   }
 }

@@ -21,7 +21,7 @@ export class PostController {
   @Get(':id')
   public async show(@Param('id') id: string) {
     const post = await this.postService.findById(id);
-    return fillDto(PostRdo, post.toPOJO());
+    return post.toPOJO();
   }
 
   @Get()

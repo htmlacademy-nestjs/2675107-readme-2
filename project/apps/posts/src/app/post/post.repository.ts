@@ -4,7 +4,7 @@ import { PostEntity } from './post.entity';
 import { PostMeta, PostStatus, PostType } from '@project/shared/app/types';
 import { BasePrismaRepository } from '@project/shared/core';
 import { CreatePostDto } from './dto/create-post.dto';
-import { MAX_POST_LIMIT } from './post.constant';
+import { MAX_POST_LIMIT, POST_NOT_FOUND } from './post.constant';
 import { PostFilter, postFilterToPrisma } from './post-category.filter';
 
 @Injectable()
@@ -29,19 +29,35 @@ export class PostRepository extends BasePrismaRepository<
 
   public async findById(id: string): Promise<PostEntity> {
     const document = await this.client.post.findFirst({
-      where: {
-        id,
-      },
+      where: { id },
+      include: {
+        photo: true,
+        text: true,
+        video: true,
+        quote: true,
+        link: true,
+    },
     });
 
     if (! document) {
-      throw new NotFoundException(`Category with id ${id} not found.`);
+      throw new NotFoundException(POST_NOT_FOUND);
     }
+
+    const typeToDataMap = {
+      [PostType.PHOTO]: document.photo,
+      [PostType.TEXT]: document.text,
+      [PostType.VIDEO]: document.video,
+      [PostType.QUOTE]: document.quote,
+      [PostType.LINK]: document.link,
+    };
+
+    const data = typeToDataMap[document.type] ?? null;
 
     return this.createEntityFromDocument({
       ...document,
+      data,
       type: document.type as PostType,
-      status: document.status as PostStatus
+      status: document.status as PostStatus,
     });
   }
 

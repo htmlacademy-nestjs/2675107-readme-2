@@ -8,21 +8,17 @@ export class PostRdo {
 
   @ApiProperty()
   @Expose()
-  public title: string;
-
-  @ApiProperty()
-  @Expose()
-  public content: string;
-
-  @ApiProperty()
-  @Expose()
   public authorId: string;
 
   @ApiProperty()
   @Expose()
-  public createdAt: Date;
+  public likesCount: number;
 
   @ApiProperty()
   @Expose()
-  public tags: string[];
+  public commentsCount: number;
+
+  @ApiProperty()
+  @Expose()
+  public createdAt: Date;
 }

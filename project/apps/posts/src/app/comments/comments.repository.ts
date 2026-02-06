@@ -16,8 +16,8 @@ export class CommentsRepository extends BasePrismaRepository<
 
   public async findByPostId(
     postId: string,
-    take = 50,
-    skip = 0,
+    take: number,
+    skip: number,
   ): Promise<CommentEntity[]> {
     const records = await this.client.comment.findMany({
       where: { postId },
@@ -26,7 +26,9 @@ export class CommentsRepository extends BasePrismaRepository<
       orderBy: { createdAt: 'asc' },
     });
 
-    return records.map(this.createEntityFromDocument);
+    return records.map((record) =>
+      this.createEntityFromDocument(record),
+    );
   }
 
   public async deleteById(id: string): Promise<void> {

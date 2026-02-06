@@ -6,7 +6,7 @@ import {
 import { CommentsRepository } from './comments.repository';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { PostRepository } from '../post/post.repository';
-import { POST_NOT_FOUND } from '../post/post.constant';
+import { MAX_COMMENTS_LIMIT } from './comments.constant';
 
 @Injectable()
 export class CommentsService {
@@ -23,9 +23,12 @@ export class CommentsService {
 
   public async findCommentsForPost(
     postId: string,
-    skip = 0,
+    page: number,
   ) {
-    return this.commentsRepository.findByPostId(postId, 50, skip);
+    const take = MAX_COMMENTS_LIMIT;
+    const safePage = page < 1 ? 1 : page;
+    const skip = (safePage - 1) * take;
+    return this.commentsRepository.findByPostId(postId, take, skip);
   }
 
   public async delete(id: string, userId: string) {

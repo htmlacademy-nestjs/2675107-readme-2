@@ -32,11 +32,11 @@ export class CommentsController {
   @Get()
   public async index(
     @Query('postId') postId: string,
-    @Query('skip') skip?: string,
+    @Query('page') page?: string,
   ) {
     return this.commentsService.findCommentsForPost(
       postId,
-      Number(skip) || 0,
+      Number(page) || 0,
     );
   }
 

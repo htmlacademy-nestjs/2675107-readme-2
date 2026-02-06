@@ -6,7 +6,7 @@ import {
 import { CommentsRepository } from './comments.repository';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { PostRepository } from '../post/post.repository';
-import { MAX_COMMENTS_LIMIT } from './comments.constant';
+import { CANNOT_DELETE_OTHER_USERS_COMMENT, COMMENTS_NOT_FOUND, MAX_COMMENTS_LIMIT } from './comments.constant';
 
 @Injectable()
 export class CommentsService {
@@ -35,11 +35,11 @@ export class CommentsService {
     const comment = await this.commentsRepository.findById(id);
 
     if (!comment) {
-      throw new NotFoundException('Comment not found');
+      throw new NotFoundException(COMMENTS_NOT_FOUND);
     }
 
     if (comment.userId !== userId) {
-      throw new ForbiddenException('You can delete only your own comments');
+      throw new ForbiddenException(CANNOT_DELETE_OTHER_USERS_COMMENT);
     }
 
     await this.commentsRepository.deleteById(id);

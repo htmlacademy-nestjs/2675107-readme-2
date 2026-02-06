@@ -44,7 +44,7 @@ export class CommentsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   public async delete(
     @Param('id') id: string,
-    userId: string,
+    @Query('userId') userId: string,
   ) {
     await this.commentsService.delete(id, userId);
   }

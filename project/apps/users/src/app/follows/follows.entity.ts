@@ -13,4 +13,11 @@ export class FollowsEntity {
       followingId: this.followingId,
     };
   }
+
+   static fromObject(data: any): FollowsEntity {
+    return new FollowsEntity({
+      ...data,
+      id: data._id?.toString(),
+    });
+  }
 }

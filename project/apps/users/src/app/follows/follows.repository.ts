@@ -15,7 +15,7 @@ export class FollowsRepository extends BaseMongoRepository<
     @InjectModel(FollowsModel.name)
     followsModel: Model<FollowsModel>,
   ) {
-    super(followsModel, (document) => new FollowsEntity(document));
+    super(followsModel, FollowsEntity.fromObject);
   }
 
   public async findByFollowerAndFollowing(

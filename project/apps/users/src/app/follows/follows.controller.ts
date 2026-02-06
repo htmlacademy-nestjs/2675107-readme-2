@@ -26,4 +26,18 @@ export class FollowsController {
     return { message: 'Follow successfully' };
   }
 
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'The new user has been successfully created.'
+  })
+  @UseGuards(JwtAuthGuard)
+  @Post('unfollow-user/:followindId')
+  public async delete(@Req() req, @Param('followindId', MongoIdValidationPipe) followingId: string) {
+    const userId = req.user.sub;
+
+    await this.followsService.unfollowUser(userId, followingId)
+
+    return { message: 'Unfollow successfully' };
+  }
+
 }

@@ -53,6 +53,9 @@ model Post {
   link             PostLink?
 
   comments         Comment[]
+  likes            Like[]
+
+  @@map("post")
 }
 
 model PostVideo {
@@ -61,6 +64,8 @@ model PostVideo {
   videoUrl  String
 
   post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post-video")
 }
 
 model PostText {
@@ -70,6 +75,8 @@ model PostText {
   content       String
 
   post          Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post-text")
 }
 
 model PostQuote {
@@ -78,6 +85,8 @@ model PostQuote {
   quoteAuthor   String
 
   post          Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post-quote")
 }
 
 model PostPhoto {
@@ -85,6 +94,8 @@ model PostPhoto {
   photoUrl  String
 
   post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post-photo")
 }
 
 model PostLink {
@@ -93,6 +104,8 @@ model PostLink {
   linkDescription String?
 
   post            Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post-link")
 }
 
 model Comment {
@@ -106,4 +119,15 @@ model Comment {
 
   @@index([postId])
   @@map("comments")
+}
+
+model Like {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  post        Post      @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId      String    @map("post_id")
+
+  @@index([postId])
+  @@map("likes")
 }

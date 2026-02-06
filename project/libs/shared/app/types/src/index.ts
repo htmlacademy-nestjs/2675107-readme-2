@@ -4,4 +4,5 @@ export * from './lib/comment.interface';
 export * from './lib/post.interface';
 export * from './lib/token-payload.interface';
 export * from './lib/token.interface';
-export * from './lib/follows.interface';
+export * from './lib/follow.interface';
+export * from './lib/like.interface';

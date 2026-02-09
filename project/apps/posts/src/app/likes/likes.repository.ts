@@ -10,25 +10,48 @@ export class LikesRepository extends BasePrismaRepository<LikeEntity, Like> {
     super(client, LikeEntity.fromObject);
   }
 
-  async findByUserAndPost(userId: string, postId: string): Promise<LikeEntity | null> {
+  public async findByUserAndPost(userId: string, postId: string): Promise<LikeEntity | null> {
     const record = await this.client.like.findFirst({
       where: { userId, postId },
     });
     return record ? this.createEntityFromDocument(record) : null;
   }
 
-  async createLike(userId: string, postId: string): Promise<LikeEntity> {
-    const record = await this.client.like.create({
-      data: { userId, postId },
-    });
-    return this.createEntityFromDocument(record);
+  public async createLike(userId: string, postId: string): Promise<LikeEntity> {
+    return this.client.$transaction(async (tx) => {
+      const like = await tx.like.create({
+        data: {
+          postId,
+          userId
+        }
+      })
+
+      await tx.post.update({
+        where: { id: postId },
+        data: {
+          likesCount: { increment: 1}
+        }
+      })
+
+      return this.createEntityFromDocument(like)
+    })
   }
 
-  async deleteLike(userId: string, postId: string): Promise<void> {
-    const record = await this.client.like.findFirst({ where: { userId, postId } });
+  public async deleteLike(userId: string, postId: string): Promise<void> {
 
-    if (!record) return;
+    return this.client.$transaction(async (tx) => {
+      const record = await this.findByUserAndPost(userId, postId)
 
-    await this.client.like.delete({ where: { id: record.id } });
+      await tx.like.delete({
+        where: { id: record.id }
+      })
+
+      await tx.post.update({
+        where: { id: postId },
+        data: {
+          likesCount: { decrement: 1}
+        }
+      })
+    })
   }
 }

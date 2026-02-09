@@ -31,26 +31,29 @@ export class CommentsRepository extends BasePrismaRepository<
     );
   }
 
-  public async deleteById(id: string): Promise<void> {
-    await this.client.comment.delete({
-      where: { id },
-    });
-  }
-
   public async createComment(
     dto: CreateCommentDto,
     postId: string,
     userId: string,
   ): Promise<CommentEntity> {
-    const record = await this.client.comment.create({
-      data: {
-        message: dto.message,
-        postId: postId,
-        userId,
-      },
-    });
+    return this.client.$transaction(async (tx) => {
+      const comment = await tx.comment.create({
+        data: {
+          message: dto.message,
+          postId,
+          userId
+        }
+      })
 
-    return this.createEntityFromDocument(record);
+      await tx.post.update({
+        where: { id: postId},
+        data: {
+          commentsCount: { increment: 1}
+        }
+      })
+
+      return this.createEntityFromDocument(comment)
+    })
   }
 
   public async findById(id: string): Promise<CommentEntity | null> {
@@ -59,5 +62,24 @@ export class CommentsRepository extends BasePrismaRepository<
     });
 
     return record ? this.createEntityFromDocument(record) : null;
+  }
+
+  public async deleteById(commentId: string): Promise<void> {
+    return this.client.$transaction(async (tx) => {
+      const record = await this.client.comment.findUnique({
+        where: { id: commentId },
+      });
+
+      await tx.comment.delete({
+        where: { id: commentId }
+      })
+
+      await tx.post.update({
+        where: { id: record.postId },
+        data: {
+          commentsCount: { decrement: 1}
+        }
+      })
+    })
   }
 }

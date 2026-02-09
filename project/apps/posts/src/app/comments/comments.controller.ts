@@ -40,12 +40,12 @@ export class CommentsController {
     );
   }
 
-  @Delete(':id')
+  @Delete(':commentId')
   @HttpCode(HttpStatus.NO_CONTENT)
   public async delete(
-    @Param('id') id: string,
+    @Param('commentId') commentId: string,
     @Query('userId') userId: string,
   ) {
-    await this.commentsService.delete(id, userId);
+    await this.commentsService.delete(commentId, userId);
   }
 }

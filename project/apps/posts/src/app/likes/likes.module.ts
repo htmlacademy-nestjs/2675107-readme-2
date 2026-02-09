@@ -10,4 +10,4 @@ import { LikesRepository } from './likes.repository';
   controllers: [LikesController],
   providers: [LikesService, LikesRepository, PostRepository]
 })
-export class CommentsModule {}
+export class LikesModule {}

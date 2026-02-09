@@ -3,6 +3,7 @@ import { PostRepository } from './post.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostEntity } from './post.entity';
 import { PostStatus } from '@project/shared/app/types';
+import { CANNOT_DELETE_POST, CANNOT_EDIT_POST, POST_NOT_FOUND } from './post.constant';
 
 @Injectable()
 export class PostService {
@@ -15,7 +16,7 @@ export class PostService {
 
   public async findById(id: string) {
     const post = await this.postRepository.findById(id);
-    if (!post) throw new NotFoundException('Post not found');
+    if (!post) throw new NotFoundException(POST_NOT_FOUND);
     return post;
   }
 
@@ -26,7 +27,7 @@ export class PostService {
   public async update(id: string, dto: Partial<CreatePostDto>, userId: string) {
     const post = await this.findById(id);
     if (post.authorId !== userId) {
-      throw new NotFoundException('Cannot edit this post');
+      throw new NotFoundException(CANNOT_EDIT_POST);
     }
     const updateData = {
       ...dto,
@@ -40,7 +41,7 @@ export class PostService {
   public async delete(id: string, userId: string) {
     const post = await this.findById(id);
     if (post.authorId !== userId) {
-      throw new NotFoundException('Cannot delete this post');
+      throw new NotFoundException(CANNOT_DELETE_POST);
     }
 
     await this.postRepository.deleteById(id);

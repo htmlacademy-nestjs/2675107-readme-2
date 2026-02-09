@@ -31,8 +31,8 @@ export class CommentsService {
     return this.commentsRepository.findByPostId(postId, take, skip);
   }
 
-  public async delete(id: string, userId: string) {
-    const comment = await this.commentsRepository.findById(id);
+  public async delete(commentId: string, userId: string) {
+    const comment = await this.commentsRepository.findById(commentId);
 
     if (!comment) {
       throw new NotFoundException(COMMENTS_NOT_FOUND);
@@ -42,6 +42,6 @@ export class CommentsService {
       throw new ForbiddenException(CANNOT_DELETE_OTHER_USERS_COMMENT);
     }
 
-    await this.commentsRepository.deleteById(id);
+    await this.commentsRepository.deleteById(commentId);
   }
 }

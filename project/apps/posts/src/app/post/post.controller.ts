@@ -12,7 +12,7 @@ export class PostController {
 
   @ApiResponse({ status: 201 })
   @Post()
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.CREATED)
   public async create(@Body() dto: CreatePostDto) {
     const post = await this.postService.create(dto, 'user-id-1');
     return fillDto(PostRdo, post.toPOJO());

@@ -21,4 +21,8 @@ export class PostRdo {
   @ApiProperty()
   @Expose()
   public createdAt: Date;
+
+  @ApiProperty()
+  @Expose()
+  public publishedAt: Date;
 }

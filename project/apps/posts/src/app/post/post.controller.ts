@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post, Put, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Delete, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { fillDto } from '@project/shared/helpers';
 import { PostRdo } from './rdo/post.rdo';
+import { PostQueryDto } from './dto/post-query.dto';
 
 @ApiTags('posts')
 @Controller('posts')
@@ -25,8 +26,8 @@ export class PostController {
   }
 
   @Get()
-  public async index() {
-    const posts = await this.postService.findAllPublished();
+  public async index(@Query() query: PostQueryDto) {
+    const posts = await this.postService.findAllPublished(query);
     return posts.map((p) => fillDto(PostRdo, p.toPOJO()));
   }
 
@@ -46,5 +47,12 @@ export class PostController {
   public async repost(@Param('id') id: string) {
     const post = await this.postService.repost(id, 'user-id-1');
     return fillDto(PostRdo, post.toPOJO());
+  }
+
+  @Get('drafts')
+  public async drafts() {
+    const userId = 'user-id-1';
+    const posts = await this.postService.findDrafts(userId);
+    return posts.map((p) => fillDto(PostRdo, p.toPOJO()));
   }
 }

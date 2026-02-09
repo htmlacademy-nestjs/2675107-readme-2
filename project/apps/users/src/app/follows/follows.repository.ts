@@ -28,4 +28,14 @@ export class FollowsRepository extends BaseMongoRepository<
 
     return this.createEntityFromDocument(document);
   }
+
+  // НА СЛУЧАЙ ЕСЛИ БУДЕТ МЕТОД ДЛЯ УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЕЙ
+  public async deleteAllByUserId(userId: string) {
+    await this.model.deleteMany({
+      $or: [
+        { followerId: userId },
+        { followingId: userId },
+      ],
+    }).exec();
+  }
 }

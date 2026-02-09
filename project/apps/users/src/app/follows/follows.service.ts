@@ -26,6 +26,10 @@ export class FollowsService {
         throw new NotFoundException(AUTH_USER_NOT_FOUND);
       }
 
+      // ЕСТЬ ЛИ СМЫСЛ СОЗДАВАТЬ ТАКОЙ МЕТОД ЕСЛИ МОЖНО ЧЕРЕЗ ИНДЕКС FollowsSchema.index(
+      //   { followerId: 1, followingId: 1 },
+      //   { unique: true }
+      // ); ЧТО ДЕЛАЕТ СТРОКУ УНИКАЛЬНОЙ И ТОГДА ПРОВЕРКА БУДЕТ НЕНУЖНА???
       const existingFollow = await this.followsRepository.findByFollowerAndFollowing(userId, followingId);
 
       if (existingFollow) {
@@ -38,6 +42,11 @@ export class FollowsService {
       });
 
       await this.followsRepository.save(followEntity);
+
+      await Promise.all([
+        this.userRepository.incFollowers(followingId, 1),
+        this.userRepository.incFollowing(userId, 1),
+      ])
     } catch(error) {
       this.logger.error('[Follow error]: ' + error.message);
       throw new HttpException('Ошибка подписки на пользователя.', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -63,6 +72,11 @@ export class FollowsService {
       }
 
       await this.followsRepository.deleteById(existingFollow.id);
+
+      await Promise.all([
+        this.userRepository.incFollowing(userId, -1),
+        this.userRepository.incFollowers(followingId, -1)
+      ])
     } catch(error) {
       this.logger.error('[Follow error]: ' + error.message);
       throw new HttpException('Ошибка отписки на пользователя.', HttpStatus.INTERNAL_SERVER_ERROR);

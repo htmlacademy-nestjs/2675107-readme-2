@@ -32,6 +32,18 @@ type MongoConnectionOptions = {
   authDatabase: string;
 };
 
+type RabbitConnectionOptions = {
+  user: string;
+  password: string;
+  host: string;
+  port: string;
+
+};
+
 export function getMongoConnectionString({username, password, host, port, databaseName, authDatabase}: MongoConnectionOptions): string {
   return `mongodb://${username}:${password}@${host}:${port}/${databaseName}?authSource=${authDatabase}`;
+}
+
+export function getRabbitMQConnectionString({user, password, host, port}: RabbitConnectionOptions): string {
+  return `amqp://${user}:${password}@${host}:${port}`;
 }

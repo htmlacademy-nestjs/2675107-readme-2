@@ -7,3 +7,4 @@ export * from './lib/token.interface';
 export * from './lib/follow.interface';
 export * from './lib/like.interface';
 export * from './lib/subscriber.interface';
+export * from './lib/rabbit-routing.enum';

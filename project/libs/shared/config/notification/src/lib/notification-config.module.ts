@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import notifyConfig from './notification.config';
 
-const ENV_FILE_PATH = 'apps/notify/notify.env';
+const ENV_FILE_PATH = 'apps/notification/notify.env';
 
 @Module({
   imports: [

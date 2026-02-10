@@ -30,6 +30,8 @@ export interface PostMeta {
 
   createdAt?: Date;
   publishedAt?: Date;
+
+  data?: PostPhoto | PostText | PostVideo | PostQuote | PostLink | null;
 }
 
 export interface PostVideo {

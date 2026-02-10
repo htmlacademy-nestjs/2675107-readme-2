@@ -1,5 +1,5 @@
 import { Entity } from '@project/shared/core';
-import { PostMeta, PostStatus, PostType } from '@project/shared/app/types';
+import { PostLink, PostMeta, PostPhoto, PostQuote, PostStatus, PostText, PostType, PostVideo } from '@project/shared/app/types';
 
 export class PostEntity implements PostMeta, Entity<string, PostMeta> {
   public id?: string;
@@ -20,6 +20,8 @@ export class PostEntity implements PostMeta, Entity<string, PostMeta> {
   public createdAt: Date;
   public publishedAt: Date;
 
+  public data?: PostPhoto | PostText | PostVideo | PostQuote | PostLink | null;
+
   constructor(post: Partial<PostMeta>) {
     this.populate(post);
 
@@ -33,28 +35,37 @@ export class PostEntity implements PostMeta, Entity<string, PostMeta> {
     this.likesCount = post.likesCount ?? 0;
     this.commentsCount = post.commentsCount ?? 0;
     this.tags = post.tags ?? [];
+
+    this.data = post.data ?? null;
   }
 
   public populate(data: Partial<PostMeta>): void {
     Object.assign(this, data);
   }
 
-  public toPOJO(): PostMeta {
-  return {
-    id: this.id,
-    type: this.type,
-    status: this.status,
-    authorId: this.authorId,
-    originalAuthorId: this.originalAuthorId,
-    originalPostId: this.originalPostId,
-    isRepost: this.isRepost,
-    tags: this.tags,
-    likesCount: this.likesCount,
-    commentsCount: this.commentsCount,
-    createdAt: this.createdAt,
-    publishedAt: this.publishedAt,
-  };
-}
+  public toPOJO(): PostMeta & Record<string, any> {
+    const base = {
+      id: this.id,
+      type: this.type,
+      status: this.status,
+      authorId: this.authorId,
+      originalAuthorId: this.originalAuthorId,
+      originalPostId: this.originalPostId,
+      isRepost: this.isRepost,
+      tags: this.tags,
+      likesCount: this.likesCount,
+      commentsCount: this.commentsCount,
+      createdAt: this.createdAt,
+      publishedAt: this.publishedAt,
+    };
+
+    if (this.data) {
+      const { postId, ...rest } = this.data;
+      return { ...base, ...rest };
+    }
+
+    return base;
+  }
 
 
   static fromObject(data: PostMeta): PostEntity {

@@ -1,22 +1,26 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, HttpException, HttpStatus, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UserRepository } from '../user/user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AUTH_USER_EXISTS, AUTH_USER_NOT_FOUND, AUTH_USER_PASSWORD_WRONG } from './authentication.constant';
 import { UserEntity } from '../user/user.entity';
 import { LoginUserDto } from './dto/login-user.dto';
+import { Token, TokenPayload, User,} from '@project/shared/app/types';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthenticationService {
+    private readonly logger = new Logger(AuthenticationService.name);
+
     constructor(
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly jwtService: JwtService,
   ) {}
 
   public async register(dto: CreateUserDto) {
     const {email, name, password} = dto;
 
     const user = {
-      email, name, avatar: '', passwordHash: '', postsCount: 0,
-      likes: 0, followers: 0, following: 0, dateRegistry: new Date
+      email, name, avatar: '', passwordHash: '', postsCount: 0, followers: 0, following: 0, dateRegistry: new Date
     };
 
     const existUser = await this.userRepository
@@ -45,7 +49,7 @@ export class AuthenticationService {
       throw new UnauthorizedException(AUTH_USER_PASSWORD_WRONG);
     }
 
-    return {accessToken: 'token'};
+    return existUser;
   }
 
   public async getUser(id: string) {
@@ -56,5 +60,40 @@ export class AuthenticationService {
     }
 
     return existUser;
+  }
+
+  public async createUserToken(user: User): Promise<Token> {
+    const payload: TokenPayload = {
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+    };
+
+    try {
+      const accessToken = await this.jwtService.signAsync(payload);
+      return { accessToken };
+    } catch (error) {
+      this.logger.error('[Token generation error]: ' + error.message);
+      throw new HttpException('Ошибка при создании токена.', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public async changePassword(
+    userId: string,
+    dto: { currentPassword: string; newPassword: string }
+  ) {
+    const user = await this.userRepository.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(AUTH_USER_NOT_FOUND);
+    }
+
+    const isPasswordValid = await user.comparePassword(dto.currentPassword);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException(AUTH_USER_PASSWORD_WRONG);
+    }
+
+    await user.setPassword(dto.newPassword);
+    await this.userRepository.update(userId, user);
   }
 }

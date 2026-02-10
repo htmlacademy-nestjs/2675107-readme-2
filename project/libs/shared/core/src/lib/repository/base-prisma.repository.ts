@@ -16,7 +16,6 @@ export abstract class BasePrismaRepository<
     if (!document) {
       return null;
     }
-
     return this.createEntity(document);
   }
 

@@ -8,7 +8,6 @@ export class UserEntity implements AuthUser, Entity<string> {
   public email: string;
   public name: string;
   public postsCount: number;
-  public likes: number;
   public followers: number;
   public following: number;
   public dateRegistry: Date;
@@ -24,7 +23,6 @@ export class UserEntity implements AuthUser, Entity<string> {
       email: this.email,
       name: this.name,
       postsCount: this.postsCount,
-      likes: this.likes,
       followers: this.followers,
       following: this.following,
       dateRegistry: this.dateRegistry,
@@ -37,7 +35,6 @@ export class UserEntity implements AuthUser, Entity<string> {
     this.email = data.email;
     this.name = data.name;
     this.postsCount = data.postsCount;
-    this.likes = data.likes;
     this.followers = data.followers;
     this.following = data.following;
     this.dateRegistry = data.dateRegistry;

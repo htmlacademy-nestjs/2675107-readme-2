@@ -16,4 +16,18 @@ export class UserRepository extends BaseMongoRepository<UserEntity, UserModel> {
     const document = await this.model.findOne({ email }).exec();
     return this.createEntityFromDocument(document);
   }
+
+  public async incFollowers(userId: string, value: number) {
+  return this.model.updateOne(
+    { _id: userId },
+    { $inc: { followers: value } }
+  ).exec();
+}
+
+public async incFollowing(userId: string, value: number) {
+  return this.model.updateOne(
+    { _id: userId },
+    { $inc: { following: value } }
+  ).exec();
+}
 }

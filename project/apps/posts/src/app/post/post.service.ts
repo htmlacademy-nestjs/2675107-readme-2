@@ -2,7 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PostRepository } from './post.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostEntity } from './post.entity';
-import { PostStatus } from '@project/shared/app/types';
+import { CANNOT_DELETE_POST, CANNOT_EDIT_POST, POST_NOT_FOUND } from './post.constant';
+import { PostQueryDto } from './dto/post-query.dto';
 
 @Injectable()
 export class PostService {
@@ -15,18 +16,18 @@ export class PostService {
 
   public async findById(id: string) {
     const post = await this.postRepository.findById(id);
-    if (!post) throw new NotFoundException('Post not found');
+    if (!post) throw new NotFoundException(POST_NOT_FOUND);
     return post;
   }
 
-  public async findAllPublished() {
-    return this.postRepository.find();
+  public async findAllPublished(query: PostQueryDto) {
+    return this.postRepository.find(query);
   }
 
   public async update(id: string, dto: Partial<CreatePostDto>, userId: string) {
     const post = await this.findById(id);
     if (post.authorId !== userId) {
-      throw new NotFoundException('Cannot edit this post');
+      throw new NotFoundException(CANNOT_EDIT_POST);
     }
     const updateData = {
       ...dto,
@@ -40,7 +41,7 @@ export class PostService {
   public async delete(id: string, userId: string) {
     const post = await this.findById(id);
     if (post.authorId !== userId) {
-      throw new NotFoundException('Cannot delete this post');
+      throw new NotFoundException(CANNOT_DELETE_POST);
     }
 
     await this.postRepository.deleteById(id);
@@ -65,6 +66,6 @@ export class PostService {
   }
 
   public async findDrafts(userId: string) {
-    return this.postRepository.find({status: PostStatus.DRAFT, authorId: userId});
+    return this.postRepository.findDrafts(userId);
   }
 }

@@ -8,3 +8,4 @@ export * from './lib/follow.interface';
 export * from './lib/like.interface';
 export * from './lib/subscriber.interface';
 export * from './lib/rabbit-routing.enum';
+export * from './lib/file.interface';

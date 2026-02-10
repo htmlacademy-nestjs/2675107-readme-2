@@ -27,9 +27,16 @@ export class PostController {
 
   @Get()
   public async index(@Query() query: PostQueryDto) {
-    const posts = await this.postService.findAllPublished(query);
-    return posts.map((p) => fillDto(PostRdo, p.toPOJO()));
-  }
+  const result = await this.postService.findAllPublished(query);
+
+  return {
+    posts: result.posts.map((p) => fillDto(PostRdo, p.toPOJO())),
+    totalPages: result.totalPages,
+    currentPage: result.currentPage,
+    totalItems: result.totalItems,
+    itemsPerPage: result.itemsPerPage,
+  };
+}
 
   @Put(':id')
   public async update(@Param('id') id: string, @Body() dto: Partial<CreatePostDto>) {

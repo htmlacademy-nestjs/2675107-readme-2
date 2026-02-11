@@ -1,26 +1,40 @@
-import { File } from '@project/shared/app/types';
-import { Entity } from '@project/shared/core';
+export interface FileVault {
+  id?: string;
+  originalName: string;
+  filename: string;
+  path: string;
+  mimetype: string;
+  size: number;
+  uploadedBy?: string;
+}
 
-export class FileVaultEntity implements File, Entity<string, File> {
+export class FileVaultEntity {
   public id?: string;
-  public name: string;
+  public originalName: string;
+  public filename: string;
+  public path: string;
+  public mimetype: string;
+  public size: number;
+  public uploadedBy?: string;
 
   public toPOJO() {
     return {
       id: this.id,
-      name: this.name,
-    }
+      originalName: this.originalName,
+      filename: this.filename,
+      path: this.path,
+      mimetype: this.mimetype,
+      size: this.size,
+      uploadedBy: this.uploadedBy,
+    };
   }
 
-  public populate(data: File): FileVaultEntity {
-    this.id = data.id ?? undefined;
-    this.name = data.name;
-
+  public populate(data: FileVault): FileVaultEntity {
+    Object.assign(this, data);
     return this;
   }
 
-  static fromObject(data: File): FileVaultEntity {
-    return new FileVaultEntity()
-      .populate(data);
+  static fromObject(data: FileVault): FileVaultEntity {
+    return new FileVaultEntity().populate(data);
   }
 }

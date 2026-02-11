@@ -9,6 +9,9 @@ import { randomUUID } from 'node:crypto';
 import { extension } from 'mime-types';
 
 import { FileVaultConfig } from '@project/shared/config/file-vault';
+import { InjectModel } from '@nestjs/mongoose';
+import { FileVaultModel } from './file-vault.model';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class FileVaultService {
@@ -17,6 +20,8 @@ export class FileVaultService {
   constructor(
     @Inject(FileVaultConfig.KEY)
     private readonly config: ConfigType<typeof FileVaultConfig>,
+    @InjectModel(FileVaultModel.name)
+    private readonly fileVaultModel: Model<FileVaultModel>
   ) {}
 
   private getUploadDirectoryPath(): string {
@@ -28,18 +33,32 @@ export class FileVaultService {
     return join(this.getUploadDirectoryPath(), filename);
   }
 
-  public async saveFile(file: Express.Multer.File): Promise<string> {
+  public async saveFile(
+    file: Express.Multer.File,
+    userId?: string
+  ): Promise<FileVaultModel> {
     try {
       const uploadDirectoryPath = this.getUploadDirectoryPath();
+
       const fileName = randomUUID();
       const fileExtension = extension(file.mimetype);
 
-      const destinationFile = this.getDestinationFilePath(`${fileName}.${fileExtension}`);
+      const finalFileName = `${fileName}.${fileExtension}`;
+      const destinationFile = this.getDestinationFilePath(finalFileName);
 
       await ensureDir(uploadDirectoryPath);
       await writeFile(destinationFile, new Uint8Array(file.buffer));
 
-      return destinationFile;
+      const createdFile = await this.fileVaultModel.create({
+        originalName: file.originalname,
+        filename: finalFileName,
+        path: destinationFile,
+        mimetype: file.mimetype,
+        size: file.size,
+        uploadedBy: userId
+      });
+
+      return createdFile;
     } catch (error) {
       this.logger.error(`Error while saving file: ${error.message}`);
       throw new Error(`Can't save file`);

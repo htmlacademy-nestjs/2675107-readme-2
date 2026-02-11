@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PostRepository } from './post.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostEntity } from './post.entity';
-import { CANNOT_DELETE_POST, CANNOT_EDIT_POST, POST_NOT_FOUND } from './post.constant';
+import { CANNOT_DELETE_POST, CANNOT_EDIT_POST, MAX_POST_LIMIT, POST_NOT_FOUND } from './post.constant';
 import { PostQueryDto } from './dto/post-query.dto';
 
 @Injectable()
@@ -21,7 +21,16 @@ export class PostService {
   }
 
   public async findAllPublished(query: PostQueryDto) {
-    return this.postRepository.find(query);
+    const { page = 1, limit = MAX_POST_LIMIT } = query
+
+    const { posts, totalItems } = await this.postRepository.find(query);
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+      posts, totalPages, currentPage: page,
+      totalItems, itemsPerPage: limit
+    };
   }
 
   public async update(id: string, dto: Partial<CreatePostDto>, userId: string) {
@@ -31,7 +40,7 @@ export class PostService {
     }
     const updateData = {
       ...dto,
-      publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : undefined,
+      publishedAt: new Date()
     }
 
     post.populate(updateData);

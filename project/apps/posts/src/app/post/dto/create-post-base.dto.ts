@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PostType } from '@project/shared/app/types';
-import { IsArray, IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostBaseDto {
   @ApiProperty({
@@ -11,15 +11,6 @@ export class CreatePostBaseDto {
   @IsEnum(PostType)
   type: PostType;
 
-  @ApiProperty({
-    description: 'Optional published date',
-    required: false,
-    type: String,
-    example: '2026-01-29T12:00:00.000Z',
-  })
-  @IsOptional()
-  @IsDateString()
-  publishedAt?: string;
 
   @ApiProperty({
     description: 'Post tags',

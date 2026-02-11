@@ -4,9 +4,10 @@ import { UserModule } from './user/user.module';
 import { ConfigUsersModule, getMongooseOptions } from "@project/shared/config/users"
 import { MongooseModule } from '@nestjs/mongoose';
 import { FollowsModule } from './follows/follows.module';
+import { NotifyModule } from './notification/notification.module';
 
 @Module({
-  imports: [AuthenticationModule, UserModule, FollowsModule, ConfigUsersModule, MongooseModule.forRootAsync(
+  imports: [AuthenticationModule, UserModule, FollowsModule, ConfigUsersModule, NotifyModule, MongooseModule.forRootAsync(
       getMongooseOptions()
     )],
   controllers: [],

@@ -5,7 +5,6 @@ import { PostMeta, PostStatus, PostType } from '@project/shared/app/types';
 import { BasePrismaRepository } from '@project/shared/core';
 import { CreatePostDto } from './dto/create-post.dto';
 import { MAX_POST_LIMIT, POST_NOT_FOUND } from './post.constant';
-// import { PostFilter, postFilterToPrisma } from './post-category.filter';
 import { PostQueryDto } from './dto/post-query.dto';
 import { Prisma } from '@prisma/client';
 
@@ -19,15 +18,6 @@ export class PostRepository extends BasePrismaRepository<
   ) {
     super(client, PostEntity.fromObject);
   }
-
-  // public async save(entity: PostEntity): Promise<PostEntity> {
-  //   const record = await this.client.post.create({
-  //     data: { ...entity.toPOJO() }
-  //   });
-
-  //   entity.id = record.id;
-  //   return entity;
-  // }
 
   public async findById(id: string): Promise<PostEntity> {
     const document = await this.client.post.findFirst({
@@ -63,7 +53,10 @@ export class PostRepository extends BasePrismaRepository<
     });
   }
 
-  public async find(query: PostQueryDto): Promise<PostEntity[]> {
+  public async find(query: PostQueryDto): Promise<{
+    posts: PostEntity[],
+    totalItems: number
+  }> {
       const {
       page = 1,
       limit = MAX_POST_LIMIT,
@@ -83,20 +76,24 @@ export class PostRepository extends BasePrismaRepository<
         ? { commentsCount: Prisma.SortOrder.desc }
         : { publishedAt: Prisma.SortOrder.desc };
 
-    const documents = await this.client.post.findMany({
-      where,
-      orderBy,
-      take: limit,
-      skip: (page - 1) * limit,
-    });
+    const [documents, totalItems] = await Promise.all([
+      this.client.post.findMany({
+        where,
+        orderBy,
+        take: limit,
+        skip: (page - 1) * limit,
+      }),
+      this.client.post.count({ where })
+    ]);
 
-    return documents.map((doc) =>
+    const posts = documents.map((doc) =>
       this.createEntityFromDocument({
         ...doc,
         type: doc.type as PostType,
         status: doc.status as PostStatus,
       }),
     );
+    return { posts, totalItems}
   }
 
   public async deleteById(id: string): Promise<void> {

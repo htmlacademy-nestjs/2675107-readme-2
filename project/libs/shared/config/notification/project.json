@@ -1,0 +1,9 @@
+{
+  "name": "shared-config-notification",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/config/notification/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project shared-config-notification --web",
+  "targets": {}
+}

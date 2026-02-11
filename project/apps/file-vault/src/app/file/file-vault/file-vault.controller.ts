@@ -1,6 +1,6 @@
 import 'multer';
 import { Express } from 'express';
-import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { FileVaultService } from './file-vault.service';
@@ -13,7 +13,10 @@ export class FileVaultController {
 
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
-  public async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.fileVaultService.saveFile(file);
+  public async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Query('userId') userId: string,
+  ) {
+    return this.fileVaultService.saveFile(file, userId);
   }
 }

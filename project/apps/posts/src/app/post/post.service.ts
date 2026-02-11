@@ -40,7 +40,7 @@ export class PostService {
     }
     const updateData = {
       ...dto,
-      publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : undefined,
+      publishedAt: new Date()
     }
 
     post.populate(updateData);

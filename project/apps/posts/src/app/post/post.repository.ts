@@ -19,15 +19,6 @@ export class PostRepository extends BasePrismaRepository<
     super(client, PostEntity.fromObject);
   }
 
-  // public async save(entity: PostEntity): Promise<PostEntity> {
-  //   const record = await this.client.post.create({
-  //     data: { ...entity.toPOJO() }
-  //   });
-
-  //   entity.id = record.id;
-  //   return entity;
-  // }
-
   public async findById(id: string): Promise<PostEntity> {
     const document = await this.client.post.findFirst({
       where: { id },
